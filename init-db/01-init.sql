@@ -67,3 +67,30 @@ CREATE TABLE IF NOT EXISTS saudi_partnerships (
   status ENUM('new','review','matched','closed') DEFAULT 'new',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
+-- =============================================================
+-- ADMIN USERS
+-- =============================================================
+CREATE TABLE IF NOT EXISTS admin_users (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  full_name VARCHAR(255),
+  role ENUM('admin','reviewer') DEFAULT 'admin',
+  is_active TINYINT(1) DEFAULT 1,
+  last_login_at TIMESTAMP NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Default admin (email: admin@sgbc.local / password: ChangeMe!2024)
+-- Hash generated with bcryptjs, cost 10
+INSERT INTO admin_users (email, password_hash, full_name, role)
+VALUES (
+  'admin@sgbc.local',
+  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+  'Council Admin',
+  'admin'
+)
+ON DUPLICATE KEY UPDATE email = email;

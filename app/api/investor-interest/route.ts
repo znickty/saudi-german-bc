@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { getPool } from "@/lib/db";
+import { getPool } from "../../lib/db";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // Basic server-side validation
     if (!body.companyName || !body.contactPerson || !body.businessEmail) {
       return NextResponse.json(
         { error: "companyName, contactPerson and businessEmail are required." },
@@ -26,34 +25,19 @@ export async function POST(req: Request) {
         ready_for_intro
       ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `;
-
     const values = [
-      body.companyName,
-      body.website ?? null,
-      body.yearEstablished ?? null,
-      body.headquarters ?? null,
-      body.contactPerson,
-      body.position ?? null,
-      body.businessEmail,
-      body.telephone ?? null,
-      body.companySize ?? null,
-      body.primaryIndustry ?? null,
-      body.mainProducts ?? null,
-      body.currentMarkets ?? null,
-      body.opportunityDescription ?? null,
-      body.reasonForSaudi ?? null,
-      body.targetIndustries ?? null,
-      body.preferredGeography ?? null,
-      body.investmentRange ?? null,
-      body.implementationTimeframe ?? null,
-      body.projectStage ?? null,
+      body.companyName, body.website ?? null, body.yearEstablished ?? null,
+      body.headquarters ?? null, body.contactPerson, body.position ?? null,
+      body.businessEmail, body.telephone ?? null, body.companySize ?? null,
+      body.primaryIndustry ?? null, body.mainProducts ?? null,
+      body.currentMarkets ?? null, body.opportunityDescription ?? null,
+      body.reasonForSaudi ?? null, body.targetIndustries ?? null,
+      body.preferredGeography ?? null, body.investmentRange ?? null,
+      body.implementationTimeframe ?? null, body.projectStage ?? null,
       JSON.stringify(body.cooperationTypes ?? []),
-      body.partnerType ?? null,
-      body.partnerCapabilities ?? null,
-      body.requiredResources ?? null,
-      body.desiredContribution ?? null,
-      body.germanContribution ?? null,
-      body.exclusivity ?? "maybe",
+      body.partnerType ?? null, body.partnerCapabilities ?? null,
+      body.requiredResources ?? null, body.desiredContribution ?? null,
+      body.germanContribution ?? null, body.exclusivity ?? "maybe",
       body.readyForIntro ? 1 : 0,
     ];
 
@@ -65,7 +49,7 @@ export async function POST(req: Request) {
       id: (result as any).insertId,
       message: "Submission received. Our team will review and follow up.",
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Investor interest submit error:", err);
     return NextResponse.json(
       { error: "Submission failed. Please try again later." },
