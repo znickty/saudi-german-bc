@@ -5,9 +5,18 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="container nav-inner">
-        <Link href="/" className="logo">
-          <Image src="/logomark.png" alt="Saudi German Business Council" width={52} height={52} />
-          <span>Saudi German Business Council</span>
+        <Link href="/" className="logo" aria-label="Saudi German Business Council">
+          <Image
+            src="/logomark.png"
+            alt="Saudi German Business Council"
+            width={200}
+            height={54}
+            priority
+          />
+          <div className="logo-text">
+            <span className="en">Saudi German Business Council</span>
+            <span className="ar">مجلس الأعمال السعودي الألماني</span>
+          </div>
         </Link>
         <nav className="nav-links">
           <a href="#why-saudi">Why Saudi</a>

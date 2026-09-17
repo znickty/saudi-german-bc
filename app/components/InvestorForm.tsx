@@ -82,6 +82,7 @@ export default function InvestorForm() {
 
   return (
     <section id="investor-form" className="section" style={{ background: "linear-gradient(180deg, #f1eedb, #ffffff)" }}>
+        <div className="pattern-bg green" aria-hidden />
       <div className="container">
         <h2>German Investor Interest</h2>
         <h3>Tell Us What Your Company Can Bring to Saudi Arabia</h3>

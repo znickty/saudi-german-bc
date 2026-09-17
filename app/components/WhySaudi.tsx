@@ -13,6 +13,7 @@ const opportunities = [
 export default function WhySaudi() {
   return (
     <section id="why-saudi" className="section">
+        <div className="pattern-bg blue" aria-hidden />
       <div className="container">
         <h2>Why Saudi Arabia Is a Strategic Manufacturing and Investment Base</h2>
         <p>

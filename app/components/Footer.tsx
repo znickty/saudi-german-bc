@@ -1,10 +1,17 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="footer">
+      <div className="pattern-bg brown" aria-hidden />
       <div className="container">
         <div className="footer-row">
-          <strong style={{ fontSize: "1.2rem" }}>Saudi German Business Council</strong>
-          <span style={{ fontWeight: 300 }}>German Excellence. Saudi Opportunity. Regional Growth.</span>
+          <div className="footer-logo">
+            <Image src="/logo.png" alt="SGBC" width={200} height={100} />
+          </div>
+          <span style={{ fontWeight: 500, letterSpacing: ".02em" }}>
+            German Excellence. Saudi Opportunity. Regional Growth.
+          </span>
         </div>
         <p>
           Our purpose is to create enduring bilateral partnerships that combine German

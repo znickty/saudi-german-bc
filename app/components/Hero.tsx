@@ -3,8 +3,10 @@ import Image from "next/image";
 export default function Hero() {
   return (
     <section className="hero">
+      <div className="pattern-bg green" aria-hidden />
       <div className="container hero-grid">
         <div className="hero-content">
+          <span className="hero-eyebrow">Saudi–German Business Council · EST 1997</span>
           <h1>
             Build in Saudi Arabia.<br />
             Grow Across the Region.
@@ -26,7 +28,14 @@ export default function Hero() {
           </div>
         </div>
         <div className="hero-image">
-          <Image src="/logo.png" alt="Saudi German Business Council" width={420} height={420} className="hero-logo" priority />
+          <Image
+            src="/logo-vertical.png"
+            alt="Saudi German Business Council"
+            width={420}
+            height={420}
+            className="hero-logo"
+            priority
+          />
         </div>
       </div>
     </section>

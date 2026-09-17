@@ -20,7 +20,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
-  font-family: var(--font-ibm-plex), "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif;
+  font-family: var(--font-ibm-plex-arabic), var(--font-ibm-plex), "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif;
   background: var(--clarity);
   color: var(--dune);
   line-height: 1.55;
