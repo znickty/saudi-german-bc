@@ -1,28 +1,34 @@
 import Image from "next/image";
 
-export default function Footer() {
+type FooterDict = {
+  purpose: string;
+  rights: string;
+  investorLink: string;
+  membershipLink: string;
+};
+
+export default function Footer({
+  t,
+  tagline,
+}: {
+  t: FooterDict;
+  tagline: string;
+}) {
   return (
     <footer className="footer">
       <div className="pattern-bg brown" aria-hidden />
       <div className="container">
         <div className="footer-row">
           <div className="footer-logo">
-            <Image src="/logo.png" alt="SGBC" width={200} height={100} />
+            <Image src="/logo.png" alt="SGBC" width={200} height={60} />
           </div>
-          <span style={{ fontWeight: 500, letterSpacing: ".02em" }}>
-            German Excellence. Saudi Opportunity. Regional Growth.
-          </span>
+          <span style={{ fontWeight: 500, letterSpacing: ".02em" }}>{tagline}</span>
         </div>
-        <p>
-          Our purpose is to create enduring bilateral partnerships that combine German
-          industrial excellence with Saudi Arabia's investment capacity, market growth,
-          strategic location and determination to build a diversified and internationally
-          competitive economy.
-        </p>
+        <p>{t.purpose}</p>
         <div className="footer-row">
-          <p>© {new Date().getFullYear()} Saudi German Business Council. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Saudi German Business Council. {t.rights}</p>
           <p>
-            <a href="#investor-form">German Investor Interest</a> · <a href="#membership">Membership</a>
+            <a href="#investor-form">{t.investorLink}</a> · <a href="#membership">{t.membershipLink}</a>
           </p>
         </div>
       </div>

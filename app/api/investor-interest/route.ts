@@ -14,6 +14,7 @@ export async function POST(req: Request) {
 
     const sql = `
       INSERT INTO investor_interests (
+        investor_type, country_origin,
         company_name, website, year_established, headquarters,
         contact_person, position, business_email, telephone,
         company_size, primary_industry, main_products, current_markets,
@@ -23,9 +24,10 @@ export async function POST(req: Request) {
         partner_type, partner_capabilities, required_resources,
         desired_contribution, german_contribution, exclusivity,
         ready_for_intro
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     `;
     const values = [
+      body.investorType, body.countryOrigin ?? null,
       body.companyName, body.website ?? null, body.yearEstablished ?? null,
       body.headquarters ?? null, body.contactPerson, body.position ?? null,
       body.businessEmail, body.telephone ?? null, body.companySize ?? null,

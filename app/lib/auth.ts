@@ -47,3 +47,10 @@ export async function requireSession(): Promise<SessionPayload> {
   if (!session) throw new Error("UNAUTHORIZED");
   return session;
 }
+
+export function canAssign(role: string) {
+  return role === "admin" || role === "chairman";
+}
+export function canViewAll(role: string) {
+  return role !== "general_committee";
+}

@@ -1,29 +1,15 @@
-export default function BeyondTrade() {
+type BeyondDict = { title: string; p1: string; p2: string; p3: string; p4: string };
+
+export default function BeyondTrade({ t }: { t: BeyondDict }) {
   return (
     <section className="section">
+      <div className="pattern-bg green" aria-hidden />
       <div className="container">
-        <h2>Beyond Trade: Building Long-Term Industrial Partnerships</h2>
-        <p>
-          Saudi–German business relations have traditionally been built on trade, engineering
-          excellence, industrial equipment, technology and technical expertise. The next stage
-          must go further.
-        </p>
-        <p>
-          Our objective is to move Saudi–German relations beyond trade by encouraging German
-          companies to establish manufacturing facilities, joint ventures, technology
-          partnerships, regional service centers, research and development activities, and
-          other long-term investments in the Kingdom.
-        </p>
-        <p>
-          A Saudi presence can bring German companies closer to major customers and projects,
-          reduce transport distances and selected supply-chain risks, support locally adapted
-          products, and provide a platform for growth across Saudi Arabia and the wider region.
-        </p>
-        <p>
-          For the right business and operating model, establishing a Saudi presence can create
-          important commercial advantages compared with continuing to serve the market
-          exclusively through exports from Europe.
-        </p>
+        <h2>{t.title}</h2>
+        <p>{t.p1}</p>
+        <p>{t.p2}</p>
+        <p>{t.p3}</p>
+        <p>{t.p4}</p>
       </div>
     </section>
   );

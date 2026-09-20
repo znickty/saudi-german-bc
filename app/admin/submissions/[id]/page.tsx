@@ -21,6 +21,10 @@ export default async function SubmissionDetail({ params }: { params: { id: strin
     [params.id]
   );
 
+  const members = await query<any>(
+  "SELECT id, full_name, role, committee_email FROM admin_users WHERE is_active = 1 AND role IN ('main_committee','general_committee') ORDER BY full_name"
+);
+
   return (
     <main style={{ minHeight: "100vh", background: "#f1eedb", padding: "2rem 0" }}>
       <div className="container">

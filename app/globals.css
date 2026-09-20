@@ -108,12 +108,12 @@ img { max-width: 100%; height: auto; display: block; }
 .hero-content p { max-width: 92%; font-size: 1.12rem; }
 .hero-logo { max-height: 380px; margin: 0 auto; }
 .hero-eyebrow {
-  display: inline-block;
+  /* display: inline-block;
   font-weight: 500;
-  font-size: .85rem;
+  font-size: 0.85rem;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: var(--palm-green);
+  color: var(--palm-green); */
   margin-bottom: 1rem;
 }
 
@@ -238,3 +238,156 @@ img { max-width: 100%; height: auto; display: block; }
   .section { padding: 3.5rem 0; }
   .logo-text .ar { display: none; }
 }
+
+/* ============ VERTICAL SIDE PATTERN (right edge) ============ */
+body {
+  position: relative;
+}
+
+.side-pattern {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 70px;               /* adjust to taste: 60–90px */
+  height: 100vh;
+  background-image: url("/patterns/side-pattern.png");
+  background-repeat: repeat-y;
+  background-size: 350px auto;
+  background-position: top right;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* On mobile, shrink or hide */
+@media (max-width: 960px) {
+  .side-pattern {
+    width: 40px;
+    background-size: 40px auto;
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 640px) {
+  .side-pattern {
+    display: none;
+  }
+}
+
+/* Push main content left a bit so the pattern doesn't overlap CTAs */
+@media (min-width: 961px) {
+  body {
+    padding-right: 70px;
+  }
+}
+
+.logo-partners {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.logo-partners img {
+  height: 46px;
+  width: auto;
+}
+.logo-divider {
+  font-size: 1.4rem;
+  color: rgba(57,34,49,.25);
+  font-weight: 300;
+}
+@media (max-width: 1100px) {
+  .logo-text { display: none; }
+}
+@media (max-width: 800px) {
+  .logo-partners img { height: 36px; }
+  .logo-partners img:last-child { display: none; } /* hide FSC on very small screens */
+}
+
+.hero-logos {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  justify-content: center;
+}
+.hero-logos-divider {
+  width: 1px;
+  height: 200px;
+  background: rgba(57,34,49,.15);
+}
+.hero-logos img {
+  max-height: 200px;
+  width: auto;
+}
+
+.lang-switch {
+  display: inline-flex;
+  gap: .2rem;
+  background: rgba(57,34,49,.06);
+  padding: .2rem;
+  border-radius: 30px;
+}
+.lang-switch button {
+  background: transparent;
+  border: none;
+  padding: .35rem .8rem;
+  border-radius: 30px;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: .82rem;
+  cursor: pointer;
+  color: var(--dune);
+}
+.lang-switch button.active {
+  background: var(--dune);
+  color: var(--clarity);
+}
+
+.investor-type-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: .4rem;
+}
+.investor-type-toggle label {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem 1rem;
+  background: var(--clarity);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: .95rem;
+  transition: all .15s;
+  flex: 1;
+  min-width: 260px;
+}
+.investor-type-toggle label.active {
+  border-color: var(--palm-green);
+  background: rgba(2,190,65,.06);
+  box-shadow: 0 0 0 3px rgba(2,190,65,.12);
+}
+.investor-type-toggle input { accent-color: var(--palm-green); }
+
+
+/* ============ RTL SUPPORT ============ */
+[dir="rtl"] .nav-inner,
+[dir="rtl"] .footer-row { flex-direction: row-reverse; }
+
+[dir="rtl"] .hero-grid { direction: rtl; }
+[dir="rtl"] .side-pattern {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] body { padding-right: 0; padding-left: 70px; }
+@media (max-width: 960px) {
+  [dir="rtl"] body { padding-left: 40px; }
+}
+@media (max-width: 640px) {
+  [dir="rtl"] body { padding-left: 0; }
+}
+
+[dir="rtl"] .logo-partners { flex-direction: row-reverse; }
+[dir="rtl"] .hero-logos { flex-direction: row-reverse; }
