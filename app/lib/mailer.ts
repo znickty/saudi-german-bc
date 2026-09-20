@@ -1,8 +1,8 @@
-import nodemailer from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
 
-let transporter: nodemailer.Transporter | null = null;
+let transporter: Transporter | null = null;
 
-export function getMailer() {
+export function getMailer(): Transporter {
   if (!transporter) {
     transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -18,7 +18,8 @@ export function getMailer() {
 }
 
 export async function sendMail(opts: {
-  from: string;          // e.g. "Name <member@sgbc.org>"
+  from: string;
+  fromName?: string;
   to: string;
   cc?: string;
   subject: string;
@@ -27,8 +28,9 @@ export async function sendMail(opts: {
   inReplyTo?: string;
   references?: string;
 }) {
+  const displayName = opts.fromName || process.env.SMTP_FROM_NAME || "SGBC";
   return getMailer().sendMail({
-    from: `${process.env.SMTP_FROM_NAME} <${opts.from}>`,
+    from: `${displayName} <${opts.from}>`,
     to: opts.to,
     cc: opts.cc,
     subject: opts.subject,

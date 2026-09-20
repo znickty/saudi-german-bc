@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const mysql = require("mysql2/promise");
 
+console.log("Starting migrations...");
+
 async function main() {
   const conn = await mysql.createConnection({
     host: process.env.DB_HOST || "127.0.0.1",
@@ -20,6 +22,7 @@ async function main() {
   `);
 
   const dir = path.join(__dirname, "..", "db", "migrations");
+  console.log(`Looking for migrations in ${dir}`);
   const files = fs.readdirSync(dir).filter((f) => f.endsWith(".sql")).sort();
   const [rows] = await conn.query("SELECT name FROM _migrations");
   const applied = new Set(rows.map((r) => r.name));

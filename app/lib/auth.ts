@@ -4,11 +4,16 @@ import { cookies } from "next/headers";
 const secret = new TextEncoder().encode(process.env.AUTH_SECRET!);
 const cookieName = process.env.AUTH_COOKIE_NAME || "sgbc_admin_session";
 
+// ---- single source of truth for roles ----
+export const ROLES = ["admin", "chairman", "main_committee", "general_committee"] as const;
+export type Role = (typeof ROLES)[number];
+
 export type SessionPayload = {
-  sub: string;      // admin user id
-  email: string;
-  name: string;
-  role: "admin" | "reviewer";
+  sub: string;        // admin_users.id (string form)
+  email: string;      // login email
+  name: string;       // full_name
+  role: Role;
+  committeeEmail?: string | null;
 };
 
 export async function createSession(payload: SessionPayload) {
@@ -18,17 +23,19 @@ export async function createSession(payload: SessionPayload) {
     .setExpirationTime("8h")
     .sign(secret);
 
-  cookies().set(cookieName, token, {
+  const cookieStore = await cookies();
+  cookieStore.set(cookieName, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 8, // 8 hours
+    maxAge: 60 * 60 * 8,
   });
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  const token = cookies().get(cookieName)?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(cookieName)?.value;
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret);
@@ -39,7 +46,8 @@ export async function getSession(): Promise<SessionPayload | null> {
 }
 
 export async function destroySession() {
-  cookies().delete(cookieName);
+  const cookieStore = await cookies();
+  cookieStore.delete(cookieName);
 }
 
 export async function requireSession(): Promise<SessionPayload> {
@@ -48,9 +56,15 @@ export async function requireSession(): Promise<SessionPayload> {
   return session;
 }
 
-export function canAssign(role: string) {
+// ---- permission helpers ----
+export function canAssign(role: Role): boolean {
   return role === "admin" || role === "chairman";
 }
-export function canViewAll(role: string) {
-  return role !== "general_committee";
+
+export function canViewAll(role: Role): boolean {
+  return role === "admin" || role === "chairman" || role === "main_committee";
+}
+
+export function isCommitteeMember(role: Role): boolean {
+  return role === "main_committee" || role === "general_committee";
 }
