@@ -57,6 +57,7 @@ export default function InvestorForm({ t, lang }: { t: FormDict; lang: Locale })
     ).map((el) => el.value);
 
     const payload = {
+      locale: lang,
       investorType: type,
       companyName: fd.get("companyName"),
       website: fd.get("website"),

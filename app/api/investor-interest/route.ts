@@ -1,16 +1,30 @@
 import { NextResponse } from "next/server";
 import { getPool } from "@/lib/db";
+import { sendMail } from "@/lib/mailer";
+import { buildInvestorConfirmationEmail } from "@/lib/email-templates/investor-confirmation";
+import { locales, defaultLocale, type Locale } from "@/i18n/config";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+    // Required fields
     if (!body.companyName || !body.contactPerson || !body.businessEmail) {
       return NextResponse.json(
         { error: "companyName, contactPerson and businessEmail are required." },
         { status: 400 }
       );
     }
+
+    // Locale — fall back to default if missing/invalid
+    const localeInput = String(body.locale || "").toLowerCase();
+    const locale: Locale = (locales as readonly string[]).includes(localeInput)
+      ? (localeInput as Locale)
+      : defaultLocale;
+
+    const investorType: "german" | "saudi" | "other" =
+      body.investorType === "saudi" ? "saudi" :
+      body.investorType === "other" ? "other" : "german";
 
     const sql = `
       INSERT INTO investor_interests (
@@ -28,7 +42,7 @@ export async function POST(req: Request) {
     `;
 
     const values = [
-      body.investorType ?? "german",
+      investorType,
       body.countryOrigin ?? null,
       body.companyName,
       body.website ?? null,
@@ -61,11 +75,34 @@ export async function POST(req: Request) {
 
     const pool = getPool();
     const [result] = await pool.execute(sql, values);
+    const submissionId = (result as any).insertId as number;
+
+    // ---- Send confirmation email (fire and forget, log errors) ----
+    const { subject, html, text } = buildInvestorConfirmationEmail({
+      locale,
+      to: body.businessEmail,
+      contactPerson: body.contactPerson,
+      companyName: body.companyName,
+      submissionId,
+      investorType,
+    });
+
+    try {
+      await sendMail({
+        to: body.businessEmail,
+        subject,
+        html,
+        text,
+      });
+    } catch (mailErr) {
+      // Do not fail the submission if the email fails
+      console.error("Confirmation email failed:", mailErr);
+    }
 
     return NextResponse.json({
       ok: true,
-      id: (result as any).insertId,
-      message: "Submission received. Our team will review and follow up.",
+      id: submissionId,
+      message: "Submission received. A confirmation email has been sent.",
     });
   } catch (err) {
     console.error("Investor interest submit error:", err);
