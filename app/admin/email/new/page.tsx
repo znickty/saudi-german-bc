@@ -1,93 +1,91 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-function ComposeForm() {
+function ComposeInner() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [to, setTo] = useState(searchParams.get("to") ?? "");
-  const [subject, setSubject] = useState(searchParams.get("subject") ?? "");
+  const params = useSearchParams();
+  const [to, setTo] = useState(params.get("to") ?? "");
+  const [cc, setCc] = useState("");
+  const [subject, setSubject] = useState(params.get("subject") ?? "");
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const submissionId = params.get("submissionId");
 
   async function send() {
     setSending(true);
     setError(null);
-
-    const submissionId = searchParams.get("submissionId");
-
-    const res = await fetch("/api/admin/email/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to,
-        subject,
-        body,
-        submissionId: submissionId ? Number(submissionId) : null,
-      }),
-    });
-
-    setSending(false);
-
-    if (!res.ok) {
-      const d = await res.json();
-      setError(d.error || "Failed to send");
-      return;
+    try {
+      const res = await fetch("/api/admin/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to,
+          cc: cc || undefined,
+          subject,
+          body,
+          submissionId: submissionId ? Number(submissionId) : null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Send failed");
+      router.push(`/admin/email/${data.threadId}`);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setSending(false);
     }
-
-    const { threadId } = await res.json();
-    router.push(`/admin/email/${threadId}`);
   }
 
   return (
-    <div className="form-wrap">
-      <div className="field">
-        <label>To</label>
-        <input value={to} onChange={(e) => setTo(e.target.value)} />
-      </div>
-      <div className="field">
-        <label>Subject</label>
-        <input value={subject} onChange={(e) => setSubject(e.target.value)} />
-      </div>
-      <div className="field">
-        <label>Message</label>
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          rows={12}
-        />
-      </div>
-      <button
-        className="btn btn-primary"
-        onClick={send}
-        disabled={sending}
-        style={{ width: "100%" }}
-      >
-        {sending ? "Sending…" : "Send"}
-      </button>
-      {error && (
-        <div className="error" style={{ marginTop: "1rem" }}>
-          {error}
+    <>
+      <header className="admin-header">
+        <div>
+          <h1>Compose</h1>
+          {submissionId && <p>Re: submission #{submissionId}</p>}
         </div>
-      )}
-    </div>
+        <button className="btn btn-secondary" onClick={() => router.back()}>
+          Cancel
+        </button>
+      </header>
+
+      <div className="compose-box">
+        <div className="field">
+          <label>To</label>
+          <input value={to} onChange={(e) => setTo(e.target.value)} placeholder="recipient@example.com" />
+        </div>
+        <div className="field">
+          <label>Cc</label>
+          <input value={cc} onChange={(e) => setCc(e.target.value)} placeholder="optional" />
+        </div>
+        <div className="field">
+          <label>Subject</label>
+          <input value={subject} onChange={(e) => setSubject(e.target.value)} />
+        </div>
+        <div className="field">
+          <label>Message</label>
+          <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={14} />
+        </div>
+        <button
+          className="btn btn-primary"
+          onClick={send}
+          disabled={sending || !to || !subject || !body}
+          style={{ width: "100%" }}
+        >
+          {sending ? "Sending…" : "Send"}
+        </button>
+        {error && <div className="error" style={{ marginTop: "1rem" }}>{error}</div>}
+      </div>
+    </>
   );
 }
 
-export default function ComposeNew() {
+export default function ComposePage() {
   return (
-    <main
-      style={{ minHeight: "100vh", background: "#f1eedb", padding: "2rem 0" }}
-    >
-      <div className="container" style={{ maxWidth: 800 }}>
-        <h1 style={{ fontSize: "2rem", marginBottom: "1.5rem" }}>Compose</h1>
-        <Suspense fallback={<div>Loading form...</div>}>
-          <ComposeForm />
-        </Suspense>
-      </div>
-    </main>
+    <Suspense fallback={<p style={{ padding: "2rem" }}>Loading…</p>}>
+      <ComposeInner />
+    </Suspense>
   );
 }
