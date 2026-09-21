@@ -28,19 +28,21 @@ export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-export default function LangLayout({
+export default async function LangLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }) {
-  if (!locales.includes(params.lang)) notFound();
+  const { lang } = await params;
+
+  if (!locales.includes(lang)) notFound();
 
   return (
     <html
-      lang={params.lang}
-      dir={localeDir[params.lang]}
+      lang={lang}
+      dir={localeDir[lang]}
       className={`${ibmPlex.variable} ${ibmPlexArabic.variable}`}
     >
       <body>

@@ -11,12 +11,17 @@ import AfterSubmission from "../components/AfterSubmission";
 import InvestorForm from "../components/InvestorForm";
 import Footer from "../components/Footer";
 
-export default async function Home({ params }: { params: { lang: Locale } }) {
-  const t = await getDictionary(params.lang);
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}) {
+  const { lang } = await params;
+  const t = await getDictionary(lang);
 
   return (
     <>
-      <Navbar lang={params.lang} t={t} />
+      <Navbar lang={lang} t={t} />
       <main>
         <Hero t={t.hero} />
         <BeyondTrade t={t.beyond} />
@@ -24,7 +29,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         <Pathways t={t.pathways} />
         <CouncilSupport t={t.support} />
         <AfterSubmission t={t.after} />
-        <InvestorForm t={t.form} lang={params.lang} />
+        <InvestorForm t={t.form} lang={lang} />
       </main>
       <Footer t={t.footer} tagline={t.brand.tagline} />
     </>
