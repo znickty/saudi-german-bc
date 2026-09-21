@@ -18,28 +18,35 @@ type Row = {
   created_at: string;
 };
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: { status?: string; q?: string; sector?: string };
-}) {
+type AdminPageProps = {
+  searchParams: Promise<{
+    status?: string;
+    q?: string;
+    sector?: string;
+    investorType?: string;
+  }>;
+};
+
+
+export default async function AdminPage({ searchParams }: AdminPageProps) {
+  const { status, q, sector, investorType } = await searchParams;
   const session = await getSession();
   if (!session) redirect("/admin/login");
 
   const where: string[] = [];
   const params: any[] = [];
-  if (searchParams.status && searchParams.status !== "all") {
+  if (status && status !== "all") {
     where.push("status = ?");
-    params.push(searchParams.status);
+    params.push(status);
   }
-  if (searchParams.q) {
+  if (q) {
     where.push("(company_name LIKE ? OR contact_person LIKE ? OR business_email LIKE ?)");
-    const like = `%${searchParams.q}%`;
+    const like = `%${q}%`;
     params.push(like, like, like);
   }
-  if (searchParams.sector) {
+  if (sector) {
     where.push("sector_tag = ?");
-    params.push(searchParams.sector);
+    params.push(sector);
   }
 
   const rows = await query<Row>(
@@ -106,12 +113,12 @@ export default async function AdminPage({
           <input
             name="q"
             placeholder="Search company / contact / email"
-            defaultValue={searchParams.q ?? ""}
+            defaultValue={q ?? ""}
             style={{ flex: 1, minWidth: 220, padding: ".6rem .9rem", borderRadius: 10, border: "1px solid rgba(57,34,49,.16)", background: "#f1eedb" }}
           />
           <select
             name="status"
-            defaultValue={searchParams.status ?? "all"}
+            defaultValue={status ?? "all"}
             style={{ padding: ".6rem .9rem", borderRadius: 10, border: "1px solid rgba(57,34,49,.16)", background: "#f1eedb" }}
           >
             <option value="all">All statuses</option>

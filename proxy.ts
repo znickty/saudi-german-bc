@@ -1,16 +1,16 @@
+// proxy.ts
 import { NextResponse, type NextRequest } from "next/server";
 import { locales, defaultLocale } from "@/i18n/config";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Skip API, static files, admin, _next
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
-    /\.[a-zA-Z0-9]+$/.test(pathname)   // any file with extension
+    /\.[a-zA-Z0-9]+$/.test(pathname)
   ) {
     return NextResponse.next();
   }

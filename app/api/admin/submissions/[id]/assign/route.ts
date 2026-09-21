@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { getSession, canAssign } from "@/lib/auth";
 import { query, queryOne } from "@/lib/db";
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+type Params = Promise<{ id: string }>;
+
+export async function POST(req: Request, { params }: { params: Params }) {
+  const { id } = await params;
+
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // ✅ canAssign(session.role) — session.role is Role union, includes 'chairman'
   if (!canAssign(session.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -34,14 +37,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     `UPDATE investor_interests
      SET assigned_committee_member_id = ?, assigned_at = NOW(), status = 'review'
      WHERE id = ?`,
-    [memberId, params.id]
+    [memberId, id]
   );
 
   await query(
     `INSERT INTO submission_activity (submission_id, submission_type, admin_id, action, note)
      VALUES (?, 'investor', ?, 'assigned', ?)`,
     [
-      params.id,
+      id,
       Number(session.sub),
       `Assigned to ${member.full_name} (${member.committee_email ?? "no email"}). ${note ?? ""}`,
     ]

@@ -6,41 +6,53 @@ import SubmissionEditor from "./SubmissionEditor";
 
 export const dynamic = "force-dynamic";
 
-export default async function SubmissionDetail({ params }: { params: { id: string } }) {
+type PageProps = { params: Promise<{ id: string }> };
+
+export default async function SubmissionDetail({ params }: PageProps) {
+  const { id } = await params;
+
   const session = await getSession();
   if (!session) redirect("/admin/login");
 
   const sub = await queryOne<any>(
     "SELECT * FROM investor_interests WHERE id = ? LIMIT 1",
-    [params.id]
+    [id],
   );
   if (!sub) notFound();
 
   const activity = await query<any>(
-    "SELECT * FROM submission_activity WHERE submission_id = ? ORDER BY created_at DESC LIMIT 50",
-    [params.id]
+    `SELECT * FROM submission_activity
+     WHERE submission_id = ? AND submission_type = 'investor'
+     ORDER BY created_at DESC LIMIT 50`,
+    [id],
   );
 
   const members = await query<any>(
-  "SELECT id, full_name, role, committee_email FROM admin_users WHERE is_active = 1 AND role IN ('main_committee','general_committee') ORDER BY full_name"
-);
+    "SELECT id, full_name, role, committee_email FROM admin_users WHERE is_active = 1 AND role IN ('main_committee','general_committee') ORDER BY full_name",
+  );
 
   return (
-    <main style={{ minHeight: "100vh", background: "#f1eedb", padding: "2rem 0" }}>
+    <main
+      style={{ minHeight: "100vh", background: "#f1eedb", padding: "2rem 0" }}
+    >
       <div className="container">
-        <Link href="/admin" style={{ fontWeight: 500, opacity: .75 }}>← Back to dashboard</Link>
+        <Link href="/admin" style={{ fontWeight: 500, opacity: 0.75 }}>
+          ← Back to dashboard
+        </Link>
 
         <header style={{ margin: "1rem 0 2rem" }}>
           <h1 style={{ fontSize: "2rem", marginBottom: ".25rem" }}>
             #{sub.id} · {sub.company_name}
           </h1>
-          <p style={{ margin: 0, fontWeight: 300, opacity: .8 }}>
+          <p style={{ margin: 0, fontWeight: 300, opacity: 0.8 }}>
             Submitted {new Date(sub.created_at).toLocaleString()}
           </p>
         </header>
 
         <div className="grid-2">
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+          >
             <Section title="Company Information">
               <KV label="Website" value={sub.website} />
               <KV label="Year established" value={sub.year_established} />
@@ -75,16 +87,27 @@ export default async function SubmissionDetail({ params }: { params: { id: strin
                 }
               />
               <KV label="Partner type" value={sub.partner_type} />
-              <KV label="Partner capabilities" value={sub.partner_capabilities} />
+              <KV
+                label="Partner capabilities"
+                value={sub.partner_capabilities}
+              />
               <KV label="Required resources" value={sub.required_resources} />
-              <KV label="Desired contribution" value={sub.desired_contribution} />
+              <KV
+                label="Desired contribution"
+                value={sub.desired_contribution}
+              />
               <KV label="German contribution" value={sub.german_contribution} />
               <KV label="Exclusivity" value={sub.exclusivity} />
-              <KV label="Ready for intro" value={sub.ready_for_intro ? "Yes" : "No"} />
+              <KV
+                label="Ready for intro"
+                value={sub.ready_for_intro ? "Yes" : "No"}
+              />
             </Section>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
+          >
             <SubmissionEditor
               id={sub.id}
               initial={{
@@ -97,7 +120,9 @@ export default async function SubmissionDetail({ params }: { params: { id: strin
 
             <Section title="Activity Log">
               {activity.length === 0 && (
-                <p style={{ margin: 0, fontWeight: 300, opacity: .7 }}>No activity yet.</p>
+                <p style={{ margin: 0, fontWeight: 300, opacity: 0.7 }}>
+                  No activity yet.
+                </p>
               )}
               {activity.map((a: any) => (
                 <div
@@ -110,7 +135,7 @@ export default async function SubmissionDetail({ params }: { params: { id: strin
                 >
                   <strong>{a.action}</strong>
                   {a.note && <> — {a.note}</>}
-                  <div style={{ opacity: .6, fontSize: ".78rem" }}>
+                  <div style={{ opacity: 0.6, fontSize: ".78rem" }}>
                     {new Date(a.created_at).toLocaleString()}
                   </div>
                 </div>
@@ -123,7 +148,13 @@ export default async function SubmissionDetail({ params }: { params: { id: strin
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="card">
       <h3 style={{ marginBottom: "1rem" }}>{title}</h3>
@@ -134,9 +165,21 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function KV({ label, value }: { label: string; value: any }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "180px 1fr", gap: "1rem", padding: ".4rem 0", borderBottom: "1px solid rgba(57,34,49,.05)" }}>
-      <div style={{ fontWeight: 500, fontSize: ".88rem", opacity: .75 }}>{label}</div>
-      <div style={{ fontWeight: 300, fontSize: ".95rem", whiteSpace: "pre-wrap" }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "180px 1fr",
+        gap: "1rem",
+        padding: ".4rem 0",
+        borderBottom: "1px solid rgba(57,34,49,.05)",
+      }}
+    >
+      <div style={{ fontWeight: 500, fontSize: ".88rem", opacity: 0.75 }}>
+        {label}
+      </div>
+      <div
+        style={{ fontWeight: 300, fontSize: ".95rem", whiteSpace: "pre-wrap" }}
+      >
         {value == null || value === "" ? "—" : String(value)}
       </div>
     </div>
