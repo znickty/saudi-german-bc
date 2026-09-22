@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { localeDir, locales, type Locale } from "@/i18n/config";
 import { IBM_Plex_Sans_Arabic, IBM_Plex_Sans } from "next/font/google";
+import "@/globals.css";
+import { Metadata } from "next";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["latin", "arabic"],
@@ -23,6 +25,12 @@ export function generateStaticParams() {
 type LayoutProps = {
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
+};
+
+export const metadata: Metadata = {
+  icons: {
+    icon: '/icon.png', // points to public/icon.png
+  },
 };
 
 export default async function LangLayout({ children, params }: LayoutProps) {
