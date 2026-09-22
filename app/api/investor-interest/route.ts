@@ -87,17 +87,17 @@ export async function POST(req: Request) {
       investorType,
     });
 
-    try {
-      await sendMail({
-        to: body.businessEmail,
-        subject,
-        html,
-        text,
-      });
-    } catch (mailErr) {
-      // Do not fail the submission if the email fails
-      console.error("Confirmation email failed:", mailErr);
-    }
+    // try {
+    //   await sendMail({
+    //     to: body.businessEmail,
+    //     subject,
+    //     html,
+    //     text,
+    //   });
+    // } catch (mailErr) {
+    //   // Do not fail the submission if the email fails
+    //   console.error("Confirmation email failed:", mailErr);
+    // }
 
     return NextResponse.json({
       ok: true,
