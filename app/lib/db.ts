@@ -8,11 +8,11 @@ declare global {
 export function getPool(): mysql.Pool {
   if (!global.__mysqlPool) {
     global.__mysqlPool = mysql.createPool({
-      host: process.env.MYSQLHOST || "127.0.0.1",
-      port: Number(process.env.MYSQLPORT || 3306),
-      user: process.env.MYSQLUSER || "sgbc_user",
-      password: process.env.MYSQLPASSWORD || "sgbc_pass",
-      database: process.env.MYSQLDATABASE || "sgbc",
+      host: process.env.MYSQLHOST,
+      port: Number(process.env.MYSQLPORT),
+      user: process.env.MYSQLUSER,
+      password: process.env.MYSQLPASSWORD,
+      database: process.env.MYSQLDATABASE,
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0,
