@@ -50,7 +50,9 @@ export async function sendMail(opts: SendMailOpts): Promise<SendMailResult> {
     ...(opts.text ? { text: opts.text } : {}),
   };
 
-  const { data, error } = await resend.emails.send(payload);
+  const { data, error } = await resend.emails.send(
+    payload as Parameters<typeof resend.emails.send>[0]
+  );
 
   if (error) {
     console.error("Resend error:", error);
