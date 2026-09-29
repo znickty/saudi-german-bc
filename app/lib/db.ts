@@ -1,4 +1,4 @@
-import mysql from "mysql2/promise";
+import mysql, {ResultSetHeader} from "mysql2/promise";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -23,6 +23,7 @@ export function getPool(): mysql.Pool {
   return global.__mysqlPool;
 }
 
+// SELECT — returns rows array
 export async function query<T = any>(
   sql: string,
   params: any[] = []
@@ -32,10 +33,21 @@ export async function query<T = any>(
   return rows as T[];
 }
 
+// SELECT — returns one row or null
 export async function queryOne<T = any>(
   sql: string,
   params: any[] = []
 ): Promise<T | null> {
   const rows = await query<T>(sql, params);
   return rows[0] ?? null;
+}
+
+// INSERT / UPDATE / DELETE — returns ResultSetHeader
+export async function execute(
+  sql: string,
+  params: any[] = []
+): Promise<ResultSetHeader> {
+  const pool = getPool();
+  const [result] = await pool.execute(sql, params);
+  return result as ResultSetHeader;
 }

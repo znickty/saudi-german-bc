@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     if (!body.companyName || !body.contactPerson || !body.businessEmail) {
       return NextResponse.json(
         { error: "companyName, contactPerson and businessEmail are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -23,8 +23,11 @@ export async function POST(req: Request) {
       : defaultLocale;
 
     const investorType: "german" | "saudi" | "other" =
-      body.investorType === "saudi" ? "saudi" :
-      body.investorType === "other" ? "other" : "german";
+      body.investorType === "saudi"
+        ? "saudi"
+        : body.investorType === "other"
+          ? "other"
+          : "german";
 
     const sql = `
       INSERT INTO investor_interests (
@@ -77,7 +80,6 @@ export async function POST(req: Request) {
     const [result] = await pool.execute(sql, values);
     const submissionId = (result as any).insertId as number;
 
-    // ---- Send confirmation email (fire and forget, log errors) ----
     const { subject, html, text } = buildInvestorConfirmationEmail({
       locale,
       to: body.businessEmail,
@@ -87,17 +89,27 @@ export async function POST(req: Request) {
       investorType,
     });
 
-    // try {
-    //   await sendMail({
-    //     to: body.businessEmail,
-    //     subject,
-    //     html,
-    //     text,
-    //   });
-    // } catch (mailErr) {
-    //   // Do not fail the submission if the email fails
-    //   console.error("Confirmation email failed:", mailErr);
-    // }
+    try {
+      await sendMail({
+        to: body.businessEmail,
+        subject,
+        html,
+        text,
+      });
+    } catch (mailErr) {
+      console.error("Confirmation email failed:", mailErr);
+    }
+
+    // After sending user confirmation email
+    try {
+      await sendMail({
+        to: "admin@saudigermanbc.org", // Forwarded to your Gmail via Railway
+        subject: `New Submission: ${body.companyName} — SGBC-${String(submissionId).padStart(6, "0")}`,
+        text: `A new investor interest has been submitted.\n\nCompany: ${body.companyName}\nContact: ${body.contactPerson} <${body.businessEmail}>\nType: ${investorType}\n\nView: ${process.env.NEXT_PUBLIC_SITE_URL}/admin/submissions/${submissionId}`,
+      });
+    } catch (e) {
+      console.error("Admin notification failed:", e);
+    }
 
     return NextResponse.json({
       ok: true,
@@ -108,7 +120,7 @@ export async function POST(req: Request) {
     console.error("Investor interest submit error:", err);
     return NextResponse.json(
       { error: "Submission failed. Please try again later." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

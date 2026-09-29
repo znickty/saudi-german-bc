@@ -148,10 +148,10 @@ export default function InvestorForm({ t, lang }: { t: FormDict; lang: Locale })
           <h3>{t.companyInfo}</h3>
           <div className="form-grid">
             <div className="field"><label>{t.companyName}</label><input name="companyName" required /></div>
-            <div className="field"><label>{t.website}</label><input name="website" type="url" placeholder="https://" /></div>
+            <div className="field"><label>{t.website}</label><input name="website" placeholder="https://" /></div>
             <div className="field"><label>{t.yearEstablished}</label><input name="yearEstablished" type="number" min="1800" max="2100" /></div>
             <div className="field"><label>{t.headquarters}</label><input name="headquarters" /></div>
-            <div className="field"><label>{t.contactPerson}</label><input name="contactPerson" required /></div>
+            <div className="field"><label>{t.contactPerson}</label><input name="contactPerson" /></div>
             <div className="field"><label>{t.position}</label><input name="position" /></div>
             <div className="field"><label>{t.businessEmail}</label><input name="businessEmail" type="email" required /></div>
             <div className="field"><label>{t.telephone}</label><input name="telephone" /></div>

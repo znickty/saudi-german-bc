@@ -1,42 +1,48 @@
-import nodemailer, { type Transporter } from "nodemailer";
+import { Resend } from "resend";
 
-let transporter: Transporter | null = null;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-export function getMailer(): Transporter {
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === "true",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-  }
-  return transporter;
-}
+export type SendMailResult = {
+  id: string;
+  messageId: string; // alias for compatibility with old callers
+};
 
 export async function sendMail(opts: {
-  from: string;
-  fromName?: string;
   to: string;
-  cc?: string;
   subject: string;
-  text: string;
   html?: string;
-  inReplyTo?: string;
-  references?: string;
-}) {
-  const displayName = opts.fromName || process.env.SMTP_FROM_NAME || "SGBC";
-  return getMailer().sendMail({
-    from: `${displayName} <${opts.from}>`,
+  text?: string;
+  cc?: string;
+  replyTo?: string;
+  from?: string;
+  fromName?: string;
+}): Promise<SendMailResult> {
+  const fromEmail =
+    opts.from ||
+    process.env.RESEND_FROM_EMAIL ||
+    "notifications@saudigermanbc.org";
+  const fromName =
+    opts.fromName ||
+    process.env.RESEND_FROM_NAME ||
+    "Saudi German Business Council";
+
+  const { data, error } = await resend.emails.send({
+    from: `${fromName} <${fromEmail}>`,
     to: opts.to,
     cc: opts.cc,
     subject: opts.subject,
-    text: opts.text,
     html: opts.html,
-    inReplyTo: opts.inReplyTo,
-    references: opts.references,
+    text: opts.text,
+    replyTo: opts.replyTo,
   });
+
+  if (error) {
+    console.error("Resend error:", error);
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data!.id,
+    messageId: data!.id, // alias
+  };
 }
